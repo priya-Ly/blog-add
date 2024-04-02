@@ -23,7 +23,7 @@ const addBlog = async (req, res, next) => {
     await newBlog.save();
     console.log(newBlog);
 
-    return res.status(201).json({newBlog});
+    return res.status(201).json(newBlog);
   } catch (error) {
     console.log(error, error.message);
     return res.status(500).json({ error: error.message });
