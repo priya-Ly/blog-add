@@ -373,19 +373,19 @@ router.post("/upload", async (req, res) => {
     const { data, error } = await supabase.storage
       .from("editor")
       .upload(uploadedFile.name, uploadedFile.data);
+      console.log(data);
 
     if (error) {
       console.error("Error uploading file:", error.message);
       return res.status(500).json({ error: "Failed to upload file" });
     }
-    console.log(data);
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/${data.fullPath}`;
 
     // File uploaded successfully, return the URL
     console.log("File uploaded successfully:", publicUrl);
     return res.json({ success: 1, file: { url: publicUrl } });
   } catch (error) {
-    console.error("Error uploading file:", error.message);
+    console.error("Error uploading file here:", error.message);
     return res.status(500).json({ error: "Failed to upload file" });
   }
 });
