@@ -78,7 +78,7 @@ cloudinary.config({
 //     };
 //   },
 // });
-const storage = new CloudinaryStorage({
+const storage3 = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "Blog_Ly",
@@ -88,9 +88,8 @@ const storage = new CloudinaryStorage({
     },
   },
 });
-
 const upload = multer({
-  storage: storage,
+  storage: storage3,
 });
 
 const storage1 = multer.diskStorage({
@@ -131,7 +130,36 @@ function uploadMiddleware(folderName) {
   });
 }
 // const upload = uploadMiddleware("Blog_Ly");
-router.post("/blog", upload.single("image"), addBlog);
+router.post("/blog", upload.single("image"), async (req, res, next) => {
+  try {
+    console.log("hiiii");
+    const { title, authorId, content, status, bannerCaption, categoryId } =
+      req.body;
+    const image = req.file;
+    if (!image) {
+      return res.status(400).json({ message: "File or filename is missing" });
+    }
+    // const filePath = `/${image.destination}/${image.filename}`;
+    // console.log(filePath, "fp");
+    const newBlog = new BlogLy({
+      title,
+      authorId,
+      content,
+      status,
+      image: image.path,
+      bannerCaption,
+      categoryId,
+    });
+
+    await newBlog.save();
+    console.log(newBlog);
+
+    return res.status(201).json(newBlog);
+  } catch (error) {
+    console.log(error, error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
 // router.post("/upload", async (req, res) => {
 //   try {
 //     // Check if file was uploaded
@@ -373,7 +401,7 @@ router.post("/upload", async (req, res) => {
     const { data, error } = await supabase.storage
       .from("editor")
       .upload(uploadedFile.name, uploadedFile.data);
-      console.log(data);
+    console.log(data);
 
     if (error) {
       console.error("Error uploading file:", error.message);
